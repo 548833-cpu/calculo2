@@ -1,1 +1,766 @@
-<!doctype html><title>liga de los números</title><p>archivo no encontrado.</p>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>la liga de los números — multiplicaciones y cálculo mental</title>
+<meta name="description" content="juego de tablas y cálculo mental con gamificación para niños de 8 años">
+<style>
+  :root{
+    --bg:#0f172a;        /* azul pizarra oscuro */
+    --panel:#111827;     /* gris muy oscuro */
+    --card:#1f2937;      /* gris oscuro */
+    --text:#e5e7eb;      /* texto claro */
+    --muted:#94a3b8;     /* texto secundario */
+    --accent:#22c55e;    /* verde éxito */
+    --warn:#f59e0b;      /* ámbar */
+    --bad:#ef4444;       /* rojo */
+    --good:#10b981;      /* esmeralda */
+    --link:#38bdf8;      /* celeste */
+    --shadow:0 12px 40px rgba(0,0,0,.35);
+    --radius:14px;
+    --gap:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    background:
+      radial-gradient(1200px 800px at 20% -10%, #1e293b 0%, transparent 70%),
+      radial-gradient(800px 600px at 100% 0%, #0b1222 0%, transparent 60%),
+      var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.35;
+  }
+  a{color:var(--link); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .container{max-width:980px; margin:0 auto; padding:20px}
+  header.app{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin:10px 0 18px;
+  }
+  .brand{display:flex; align-items:center; gap:10px}
+  .brand .logo{
+    width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#22c55e, #0ea5e9);
+    display:grid; place-items:center; font-weight:700; color:#032e12; box-shadow:var(--shadow)
+  }
+  .brand .title{font-weight:700; font-size:18px}
+  .pill{
+    padding:.45rem .8rem; border-radius:999px; background:#0b1222; color:var(--muted); border:1px solid #1f2b46;
+    display:inline-flex; align-items:center; gap:8px; font-size:14px
+  }
+  .screen{display:none}
+  .screen.active{display:block}
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
+    border:1px solid #1f2b46; border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:18px;
+  }
+  .grid{display:grid; gap:var(--gap)}
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  @media (max-width:800px){
+    .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:8px;
+    padding:.9rem 1rem; border-radius:12px; border:1px solid #1f2b46;
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    color:var(--text); cursor:pointer; font-weight:700; transition:.15s transform ease, .15s background ease;
+    user-select:none;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:linear-gradient(180deg, #22c55e, #16a34a); color:#062b12; border-color:#15803d}
+  .btn.warn{background:linear-gradient(180deg, #f59e0b, #d97706); color:#2d1600; border-color:#b45309}
+  .btn.ghost{background:transparent}
+  .tag{font-size:12px; padding:.25rem .55rem; border-radius:999px; border:1px solid #2a3a63; color:var(--muted)}
+  .switch{display:flex; align-items:center; gap:10px}
+  .switch input{appearance:none; width:40px; height:24px; border-radius:999px; background:#233153; position:relative; outline:none; border:1px solid #2a3a63; cursor:pointer}
+  .switch input:checked{background:#1b3b2a; border-color:#2a6345}
+  .switch input:before{
+    content:""; width:18px; height:18px; background:#fff; border-radius:50%;
+    position:absolute; top:2.5px; left:3px; transition:.2s; box-shadow:0 2px 8px rgba(0,0,0,.3)
+  }
+  .switch input:checked:before{left:19px}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.0)), var(--card);
+    border:1px solid #223055; padding:16px; border-radius:12px;
+  }
+  .kbd{
+    font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    background:#0b1222; border:1px solid #223055; padding:.15rem .4rem; border-radius:6px; font-size:.95rem
+  }
+  .title-lg{font-size:34px; font-weight:900; margin:0 0 8px}
+  .subtitle{color:var(--muted); margin:0 0 14px}
+  .flex{display:flex; gap:var(--gap); align-items:center}
+  .flex.wrap{flex-wrap:wrap}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:var(--gap)}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{padding:.45rem .7rem; border-radius:10px; background:#0b1222; border:1px solid #223055; cursor:pointer}
+  .chip.active{background:#11351e; border-color:#175a34}
+  .muted{color:var(--muted)}
+  /* juego */
+  .hud{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:12px}
+  .hud .stat{display:flex; align-items:center; gap:8px; padding:.4rem .6rem; border:1px solid #223055; border-radius:10px; background:#0b1222}
+  .progress{
+    width:100%; height:10px; background:#0b1222; border-radius:999px; border:1px solid #223055; overflow:hidden
+  }
+  .progress > .bar{
+    height:100%; width:100%; background:linear-gradient(90deg, #22c55e, #10b981);
+    transform-origin:left center;
+  }
+  .task{
+    display:grid; gap:12px; padding:18px; border-radius:12px; border:1px solid #223055; background:
+      radial-gradient(400px 120px at 20% -20%, rgba(34,197,94,.12), transparent 60%),
+      var(--card);
+  }
+  .big-op{
+    font-size:64px; text-align:center; font-weight:900; letter-spacing:.02em; margin:6px 0 4px
+  }
+  .input-row{
+    display:flex; align-items:center; justify-content:center; gap:10px
+  }
+  input.answer{
+    font-size:28px; padding:.6rem .8rem; border-radius:12px; width:160px;
+    text-align:center; border:1px solid #223055; background:#0b1222; color:var(--text)
+  }
+  input.answer:focus{outline:2px solid #2563eb44; border-color:#2563eb66}
+  .keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px}
+  .keypad button{padding:12px 0; font-size:20px; border-radius:10px; border:1px solid #223055; background:#0b1222; color:var(--text); cursor:pointer}
+  .keypad button:active{transform:translateY(1px)}
+  .feedback{min-height:24px; text-align:center}
+  .feedback.ok{color:var(--good)}
+  .feedback.bad{color:var(--bad)}
+  .hint{
+    border-left:4px solid #175a34; background:#0e1f16; padding:10px 12px; border-radius:10px; font-size:15px
+  }
+  .badge{padding:.35rem .55rem; border-radius:999px; font-size:12px; border:1px solid #2a3a63; background:#0b1222}
+  .shop{display:flex; gap:10px; flex-wrap:wrap}
+  /* confeti */
+  canvas#confetti{position:fixed; inset:0; pointer-events:none}
+  /* accesibilidad */
+  .dyslexia{letter-spacing:.02em; word-spacing:.04em}
+  .high-contrast{filter:contrast(1.1) saturate(1.05)}
+  /* tabla de hechos a reforzar */
+  .facts{display:grid; grid-template-columns:repeat(6, 1fr); gap:8px}
+  .facts .fact{padding:.4rem .5rem; text-align:center; border-radius:8px; border:1px solid #223055; background:#0b1222; font-size:14px}
+  .facts .fact.low{background:#2a0f18; border-color:#511829}
+  .facts .fact.mid{background:#1b1f2e}
+  .facts .fact.high{background:#0e2a1a; border-color:#175a34}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="container">
+  <header class="app">
+    <div class="brand">
+      <div class="logo">×</div>
+      <div class="title">la liga de los números</div>
+    </div>
+    <div class="pill" id="dailyPill" title="racha diaria">📅 racha: <b id="dailyStreak">0</b></div>
+  </header>
+
+  <!-- pantalla de inicio -->
+  <section id="home" class="screen active">
+    <div class="panel grid" style="gap:18px">
+      <div>
+        <h1 class="title-lg">elige modo y tablas</h1>
+        <p class="subtitle">sesiones de 10–12 minutos recomendadas. también tienes contrarreloj de 2 minutos para un “sprint”.</p>
+
+        <div class="card">
+          <div class="row">
+            <div class="muted">modo</div>
+            <div class="chips" id="modeChips">
+              <button class="chip active" data-mode="mision">misión 12 preguntas</button>
+              <button class="chip" data-mode="reloj">contrarreloj 2 min</button>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="muted">tablas incluidas</div>
+            <div class="chips" id="tablesChips"></div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="muted">accesibilidad</div>
+            <div class="flex wrap">
+              <label class="switch"><input id="toggleDys" type="checkbox"><span>modo dislexia</span></label>
+              <label class="switch"><input id="toggleHC" type="checkbox"><span>alto contraste</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex" style="margin-top:14px">
+          <button class="btn primary" id="startBtn">empezar</button>
+          <button class="btn ghost" id="howBtn">cómo se juega</button>
+          <span class="tag">progreso local guardado</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 8px">trucos ninja que aprenderás</h3>
+        <ul style="margin:0 0 8px 18px">
+          <li>conmutativa. si te viene mejor, cambia 3×8 por 8×3.</li>
+          <li>distributiva. 7×(5+3) = 7×5 + 7×3.</li>
+          <li>10×n − n para el nueve. 9×7 = 10×7 − 7.</li>
+          <li>dobla y divide. 6×8 = (3×8)×2.</li>
+          <li>multiplicar por 5 es 10×n ÷ 2.</li>
+        </ul>
+        <div class="shop">
+          <span class="badge">racha con escudo</span>
+          <span class="badge">cofre sorpresa ético</span>
+          <span class="badge">jefe lógico</span>
+          <span class="badge">pistas escalonadas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- pantalla de juego -->
+  <section id="game" class="screen">
+    <div class="panel">
+      <div class="hud">
+        <div class="stat">🎯 objetivo: <b id="goalLabel">12 preguntas</b></div>
+        <div class="stat">⏱️ <b id="timerLabel">02:00</b></div>
+        <div class="stat">⭐ puntos: <b id="scoreLabel">0</b></div>
+        <div class="stat">🔥 racha: <b id="streakLabel">0</b></div>
+        <div class="stat" title="protege la racha en un fallo">🛡️ escudo: <b id="shieldLabel">1</b></div>
+        <div class="stat"><button class="btn" id="pauseBtn">pausar</button></div>
+      </div>
+      <div class="progress" aria-label="tiempo por pregunta"><div id="qBar" class="bar"></div></div>
+
+      <div class="task" aria-live="polite">
+        <div class="big-op" id="opText">3 × 4 = ?</div>
+        <div class="input-row">
+          <input id="answer" class="answer" inputmode="numeric" autocomplete="off" autofocus placeholder="resultado">
+          <button class="btn primary" id="okBtn">validar <span class="kbd">↵</span></button>
+          <button class="btn" id="hintBtn">pista</button>
+          <button class="btn warn" id="skipBtn">pasar</button>
+        </div>
+        <div class="keypad" aria-hidden="false">
+          <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+          <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+          <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+          <button data-k="0" style="grid-column:span 2">0</button>
+          <button data-k="←">←</button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <div id="hintBox" class="hint" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- pantalla final -->
+  <section id="summary" class="screen">
+    <div class="panel grid">
+      <div>
+        <h2 class="title-lg">resumen de la sesión</h2>
+        <p class="subtitle">repasa juntos lo conseguido y qué reforzar.</p>
+        <div class="card">
+          <div class="row"><div>puntos totales</div><div id="sumScore"><b>0</b></div></div>
+          <div class="row"><div>racha máxima</div><div id="sumBest"><b>0</b></div></div>
+          <div class="row"><div>aciertos</div><div id="sumHits"><b>0</b></div></div>
+          <div class="row"><div>fallos</div><div id="sumMiss"><b>0</b></div></div>
+          <div class="row"><div>pistas usadas</div><div id="sumHints"><b>0</b></div></div>
+        </div>
+        <div class="flex" style="margin-top:12px">
+          <button class="btn primary" id="againBtn">jugar de nuevo</button>
+          <button class="btn ghost" id="homeBtn">volver al inicio</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h3 style="margin:0 0 8px">hechos a reforzar</h3>
+          <div id="facts" class="facts"></div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h3 style="margin:0 0 8px">logros</h3>
+          <div id="achievements" class="chips"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- modal ayuda -->
+  <dialog id="howDialog" class="panel" style="max-width:720px">
+    <h3 class="title-lg">cómo se juega</h3>
+    <p class="subtitle">responde multiplicaciones rápido y con cabeza. cuando dudes, usa un truco ninja y pulsa pista.</p>
+    <ul>
+      <li>racha y multiplicador. cada acierto suma y multiplica puntos. un fallo la rompe, salvo que tengas escudo.</li>
+      <li>escudo. te protege una vez por sesión para no perder la racha.</li>
+      <li>pistas escalonadas. primero te recordamos la estrategia, luego te guiamos con una descomposición.</li>
+      <li>dificultad adaptativa. según tu velocidad y aciertos, sube o baja el nivel y el tiempo por pregunta.</li>
+      <li>progreso local. guardamos qué hechos dominas para proponerte justo lo que necesitas.</li>
+    </ul>
+    <div class="row" style="margin-top:8px">
+      <button class="btn primary" id="howClose">vale</button>
+    </div>
+  </dialog>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- utilidades ---------- */
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+  const rand = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const now = ()=>Date.now();
+
+  const STORAGE = {
+    mastery: "lln_v1_mastery",
+    stats: "lln_v1_stats",
+  };
+
+  /* ---------- estado ---------- */
+  const State = {
+    mode: "mision", // "mision" | "reloj"
+    selected: new Set([2,3,4,5,6,7,8,9,10,11,12]),
+    session: null, // datos de la sesión actual
+    mastery: loadMastery(),
+    daily: loadDaily(),
+  };
+
+  function keyFor(a,b){
+    // normaliza por conmutativa para no duplicar 3×8 y 8×3
+    const x = Math.min(a,b), y = Math.max(a,b);
+    return `${x}x${y}`;
+  }
+
+  function loadMastery(){
+    const raw = localStorage.getItem(STORAGE.mastery);
+    if(raw){ try { return JSON.parse(raw); } catch{ /* noop */ } }
+    // base 0.3 para todo 1..12
+    const m = {};
+    for(let a=1;a<=12;a++){
+      for(let b=a;b<=12;b++) m[`${a}x${b}`] = {m:0.3, seen:0, ok:0, last:0};
+    }
+    return m;
+  }
+
+  function saveMastery(){
+    localStorage.setItem(STORAGE.mastery, JSON.stringify(State.mastery));
+  }
+
+  function loadDaily(){
+    const k = STORAGE.stats;
+    const d = JSON.parse(localStorage.getItem(k) || "{}");
+    const today = new Date().toDateString();
+    if(d.lastDay !== today){
+      const yesterday = new Date(Date.now()-86400000).toDateString();
+      d.streak = (d.lastDay === yesterday) ? (d.streak||0)+1 : 1;
+      d.lastDay = today;
+      localStorage.setItem(k, JSON.stringify(d));
+    }
+    return d;
+  }
+
+  function updateDailyPill(){
+    $("#dailyStreak").textContent = State.daily.streak || 1;
+  }
+
+  /* ---------- interfaz inicio ---------- */
+  const modeChips = $("#modeChips");
+  modeChips.addEventListener("click", e=>{
+    const chip = e.target.closest(".chip"); if(!chip) return;
+    $$(".chip", modeChips).forEach(c=>c.classList.remove("active"));
+    chip.classList.add("active");
+    State.mode = chip.dataset.mode;
+  });
+
+  const tablesChips = $("#tablesChips");
+  for(let t=2;t<=12;t++){
+    const b = document.createElement("button");
+    b.className = "chip active";
+    b.textContent = `tabla del ${t}`;
+    b.dataset.t = t;
+    b.addEventListener("click", ()=>{
+      const n = Number(b.dataset.t);
+      if(State.selected.has(n)){
+        if(State.selected.size>1){ State.selected.delete(n); b.classList.remove("active"); }
+      } else { State.selected.add(n); b.classList.add("active"); }
+    });
+    tablesChips.appendChild(b);
+  }
+
+  $("#toggleDys").addEventListener("change", e=>{
+    document.body.classList.toggle("dyslexia", e.target.checked);
+  });
+  $("#toggleHC").addEventListener("change", e=>{
+    document.body.classList.toggle("high-contrast", e.target.checked);
+  });
+
+  $("#howBtn").addEventListener("click", ()=> $("#howDialog").showModal());
+  $("#howClose").addEventListener("click", ()=> $("#howDialog").close());
+
+  $("#startBtn").addEventListener("click", startGame);
+  $("#homeBtn").addEventListener("click", ()=> showScreen("home"));
+  $("#againBtn").addEventListener("click", startGame);
+
+  updateDailyPill();
+
+  /* ---------- motor del juego ---------- */
+  const DEFAULT_QUESTION_TIME = 9;   // segundos base por pregunta
+  const MIN_QTIME = 4, MAX_QTIME = 12;
+
+  const Game = {
+    ticker: null,
+    qTicker: null,
+    confetti: makeConfetti(),
+  };
+
+  function startGame(){
+    const mode = State.mode;
+    const goal = (mode==="mision") ? {type:"count", total:12} : {type:"time", total:120};
+    State.session = {
+      mode,
+      goal,
+      start: now(),
+      remaining: goal.total,
+      score:0, streak:0, best:0, shield:1,
+      hits:0, miss:0, hints:0, usedShield:false,
+      history:[],
+      current:null,
+      qDeadline:0,
+      qTotalTime:DEFAULT_QUESTION_TIME,
+      paused:false,
+    };
+    $("#goalLabel").textContent = goal.type==="count" ? "12 preguntas" : "2:00 minutos";
+    $("#scoreLabel").textContent = "0";
+    $("#streakLabel").textContent = "0";
+    $("#shieldLabel").textContent = "1";
+    $("#timerLabel").textContent = goal.type==="time" ? fmtTime(State.session.remaining) : fmtTime(0);
+
+    showScreen("game");
+    nextQuestion();
+    startTickers();
+  }
+
+  function startTickers(){
+    stopTickers();
+    Game.ticker = setInterval(()=>{
+      const S = State.session; if(!S || S.paused) return;
+      if(S.goal.type==="time"){
+        S.remaining -= 1;
+        $("#timerLabel").textContent = fmtTime(S.remaining);
+        if(S.remaining<=0){ endGame(); }
+      } else {
+        const elapsed = Math.floor((now() - S.start)/1000);
+        $("#timerLabel").textContent = fmtTime(elapsed);
+      }
+    }, 1000);
+
+    Game.qTicker = setInterval(()=>{
+      const S = State.session; if(!S || S.paused) return;
+      const left = Math.max(0, S.qDeadline - now());
+      const ratio = left / (S.qTotalTime*1000);
+      $("#qBar").style.transform = `scaleX(${ratio})`;
+      if(left<=0){ handleAnswer(null); }
+    }, 40);
+  }
+
+  function stopTickers(){
+    clearInterval(Game.ticker); clearInterval(Game.qTicker);
+  }
+
+  function fmtTime(s){
+    s = Math.max(0, s|0);
+    const m = String(Math.floor(s/60)).padStart(2,"0");
+    const ss = String(s%60).padStart(2,"0");
+    return `${m}:${ss}`;
+  }
+
+  function pickQuestion(){
+    // construye lista de hechos de tablas seleccionadas (factor 1..12)
+    const facts = [];
+    for(const a of State.selected){
+      for(let b=1;b<=12;b++){
+        const [x,y] = a<=b ? [a,b] : [b,a];
+        const k = keyFor(x,y);
+        const info = State.mastery[k] || {m:0.3, last:0};
+        const freshness = 1 - Math.min(1, (now()- (info.last||0))/ (1000*60*60*24)); // hasta 1 día
+        // peso mayor si poca maestría o hace mucho que no sale
+        const weight = (1 - (info.m||0)) + 0.15 + Math.max(0, -freshness*0.1);
+        facts.push({a:x,b:y, k, weight});
+      }
+    }
+    // evita repetir la última
+    const last = State.session?.current?.k;
+    const pool = facts.filter(f=>f.k!==last);
+    const totalW = pool.reduce((s,f)=>s+f.weight,0);
+    let r = Math.random()*totalW;
+    for(const f of pool){
+      if((r-=f.weight)<=0) return f;
+    }
+    return pool[ pool.length-1 ];
+  }
+
+  function questionTimeFor(k){
+    const info = State.mastery[k] || {m:0.3};
+    // menos tiempo si domina, más si le cuesta
+    const t = DEFAULT_QUESTION_TIME * (1.2 - info.m); // m en [0,1]
+    return clamp(t, MIN_QTIME, MAX_QTIME);
+  }
+
+  function setQuestion(f){
+    const prod = f.a * f.b;
+    State.session.current = {a:f.a, b:f.b, k:f.k, prod, hinted:false, start:now()};
+    const qTime = questionTimeFor(f.k);
+    State.session.qTotalTime = qTime;
+    State.session.qDeadline = now() + qTime*1000;
+    $("#opText").textContent = `${f.a} × ${f.b} = ?`;
+    $("#feedback").textContent = "";
+    $("#feedback").className = "feedback";
+    $("#hintBox").style.display = "none";
+    $("#answer").value = "";
+    $("#answer").focus();
+  }
+
+  function nextQuestion(){
+    const f = pickQuestion();
+    setQuestion(f);
+  }
+
+  function strategyHint(a,b){
+    const n = (a===9?b:(b===9?a:null));
+    if(n){ return `usa 10×${n} − ${n}. es más rápido para el nueve.`; }
+    if(a===5 || b===5){ const n=(a===5?b:a); return `multiplica ${n} por 10 y divide entre 2. ejemplo: ${n}×10 = ${n*10}, la mitad es ${n*5}.`; }
+    if(a%2===0 && a>=4){ const n=a/2; return `dobla y divide. piensa ${n}×${b} y luego dobla el resultado.`; }
+    if(b%2===0 && b>=4){ const n=b/2; return `dobla y divide. piensa ${a}×${n} y luego dobla el resultado.`; }
+    if(a>=10 || b>=10){ const big = (a>=10?a:b), other=(a>=10?b:a);
+      const d = big-10;
+      return `distributiva con 10. ${big}×${other} = 10×${other} + ${d}×${other}.`;
+    }
+    if(a===b){ return `piensa en cuadrados. ${a}×${a} se memorizan mejor como patrón.`; }
+    if(a*b===56){ return `truco clásico. 7×8 es 56. memorízalo con una rima: “cinco y seis, cincuenta y seis”.`; }
+    if(b===11 || a===11){ const n=(b===11?a:b); return `por 11. ${n}×11 es ${n}${n} si es de un dígito.`; }
+    if(b===12 || a===12){ const n=(b===12?a:b); return `por 12. piensa 10×${n} + 2×${n}.`; }
+    if(b<a){ return `conmutativa. cambia el orden si te ayuda: ${a}×${b} = ${b}×${a}.`; }
+    return `descompón. por ejemplo, ${a}×${b} = ${a}×(${b-1}+1) = ${a}×${b-1} + ${a}.`;
+  }
+
+  /* ---------- eventos juego ---------- */
+  $("#okBtn").addEventListener("click", ()=>handleAnswer($("#answer").value));
+  $("#answer").addEventListener("keydown", e=>{
+    if(e.key==="Enter"){ handleAnswer($("#answer").value); }
+  });
+  $("#skipBtn").addEventListener("click", ()=>handleAnswer(null, true));
+  $("#hintBtn").addEventListener("click", showHint);
+  $("#pauseBtn").addEventListener("click", togglePause);
+
+  $$(".keypad button").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const v = b.dataset.k;
+      const input = $("#answer");
+      if(v==="←"){ input.value = input.value.slice(0,-1); }
+      else { input.value += v; }
+      input.focus();
+    });
+  });
+
+  function togglePause(){
+    const S = State.session; if(!S) return;
+    S.paused = !S.paused;
+    $("#pauseBtn").textContent = S.paused ? "reanudar" : "pausar";
+  }
+
+  function showHint(){
+    const S = State.session; if(!S) return;
+    S.hints++;
+    S.current.hinted = true;
+    const {a,b} = S.current;
+    const txt = strategyHint(a,b);
+    const ex = `${a} × ${b} = ${a*b}`;
+    $("#hintBox").innerHTML = `<b>truco ninja:</b> ${txt}<br><span class="muted">ejemplo: ${ex}</span>`;
+    $("#hintBox").style.display = "block";
+  }
+
+  function handleAnswer(value, skipped=false){
+    const S = State.session; if(!S) return;
+    const {a,b,prod,k, start} = S.current;
+    const elapsedMs = now() - start;
+    const correct = (value!==null && String(prod)===String(value));
+    const usedShield = (!correct && !skipped && S.shield>0);
+
+    // feedback visual
+    if(correct){
+      $("#feedback").textContent = `bien. ${a}×${b} = ${prod}`;
+      $("#feedback").className = "feedback ok";
+    } else if(skipped){
+      $("#feedback").textContent = `pasada con penalización. la respuesta era ${prod}`;
+      $("#feedback").className = "feedback bad";
+    } else if(usedShield){
+      $("#feedback").textContent = `te protegió el escudo. la respuesta era ${prod}`;
+      $("#feedback").className = "feedback";
+    } else {
+      $("#feedback").textContent = `fallo. la respuesta era ${prod}`;
+      $("#feedback").className = "feedback bad";
+    }
+
+    // actualizar racha y escudo
+    if(correct){
+      S.streak++;
+      S.best = Math.max(S.best, S.streak);
+      const base = 10;
+      const speedBonus = clamp((S.qTotalTime*1000 - elapsedMs)/1000, 0, 6); // hasta +6
+      const mult = 1 + Math.floor((S.streak-1)/5)*0.5; // +0.5 cada 5 aciertos
+      const points = Math.round((base + speedBonus) * mult * (S.current.hinted ? 0.7 : 1));
+      S.score += points;
+      S.hits++;
+    } else {
+      if(usedShield){
+        S.shield--; S.usedShield = true;
+      } else {
+        S.streak = 0;
+        S.miss++;
+      }
+    }
+    $("#scoreLabel").textContent = S.score;
+    $("#streakLabel").textContent = S.streak;
+    $("#shieldLabel").textContent = S.shield;
+
+    // actualizar maestría
+    const M = State.mastery[k] || {m:0.3, seen:0, ok:0, last:0};
+    M.seen++;
+    if(correct && !S.current.hinted){
+      M.ok++; M.m = clamp(M.m + 0.05 + Math.min(.05, (S.streak/40)), 0, 1);
+    } else if(correct && S.current.hinted){
+      M.ok++; M.m = clamp(M.m + 0.03, 0, 1);
+    } else {
+      M.m = clamp(M.m - 0.07, 0, 1);
+    }
+    M.last = now();
+    State.mastery[k] = M;
+    saveMastery();
+
+    // registrar histórico
+    S.history.push({a,b,ok:correct, hinted:S.current.hinted, ms:elapsedMs});
+
+    // avanzar objetivo
+    if(S.goal.type==="count"){
+      S.remaining -= 1;
+      if(S.remaining<=0){ return endGame(); }
+    }
+
+    // nueva pregunta
+    nextQuestion();
+  }
+
+  function endGame(){
+    stopTickers();
+    const S = State.session;
+    // confeti si lo hizo muy bien
+    if(S.hits >= 10 || S.best>=8){ Game.confetti.fire(); }
+    // resumen
+    $("#sumScore").innerHTML = `<b>${S.score}</b>`;
+    $("#sumBest").innerHTML = `<b>${S.best}</b>`;
+    $("#sumHits").innerHTML = `<b>${S.hits}</b>`;
+    $("#sumMiss").innerHTML = `<b>${S.miss}</b>`;
+    $("#sumHints").innerHTML = `<b>${S.hints}</b>`;
+
+    // logros
+    const ach = [];
+    if(S.best>=10) ach.push("combo relámpago ×10");
+    if(S.hints===0 && S.hits>=8) ach.push("cerebro sin pistas");
+    if(S.usedShield) ach.push("escudo salvador");
+    if(S.miss===0 && S.hits>=10) ach.push("perfecto");
+    const wrap = $("#achievements"); wrap.innerHTML = "";
+    ach.forEach(t=>{
+      const s = document.createElement("span"); s.className="badge"; s.textContent = t; wrap.appendChild(s);
+    });
+
+    // hechos a reforzar
+    const pool = Object.entries(State.mastery)
+      .map(([k,v])=>({k, m:v.m, seen:v.seen}))
+      .filter(o=>o.seen>0)
+      .sort((a,b)=>a.m-b.m)
+      .slice(0,6);
+    const facts = $("#facts"); facts.innerHTML = "";
+    if(pool.length===0){ facts.innerHTML = `<div class="muted">aún no hay datos suficientes. juega otra ronda.</div>`; }
+    else {
+      for(const f of pool){
+        const [a,b] = f.k.split("x").map(Number);
+        const div = document.createElement("div");
+        div.className = "fact " + (f.m<0.35? "low" : f.m<0.7? "mid":"high");
+        div.textContent = `${a}×${b}`;
+        facts.appendChild(div);
+      }
+    }
+
+    showScreen("summary");
+  }
+
+  /* ---------- navegación de pantallas ---------- */
+  function showScreen(id){
+    $$(".screen").forEach(s=>s.classList.remove("active"));
+    $("#"+id).classList.add("active");
+  }
+
+  /* ---------- confeti mínimo ---------- */
+  function makeConfetti(){
+    const canvas = $("#confetti");
+    const ctx = canvas.getContext("2d");
+    let w=0,h=0; resize(); window.addEventListener("resize", resize);
+    function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
+    let bits=[];
+    function fire(){
+      bits = [];
+      for(let i=0;i<140;i++){
+        bits.push({
+          x: Math.random()*w,
+          y: -20 - Math.random()*h*0.5,
+          r: 2 + Math.random()*4,
+          vx: -1 + Math.random()*2,
+          vy: 2 + Math.random()*3,
+          a: Math.random()*Math.PI*2,
+          va: -0.1 + Math.random()*0.2
+        });
+      }
+      animate(0);
+      setTimeout(()=>bits=[], 2000);
+    }
+    function animate(){
+      if(bits.length===0) return;
+      ctx.clearRect(0,0,w,h);
+      for(const b of bits){
+        b.x+=b.vx; b.y+=b.vy; b.a+=b.va;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.a);
+        ctx.fillStyle = ["#22c55e","#10b981","#38bdf8","#f59e0b","#ef4444"][ (b.r|0)%5 ];
+        ctx.fillRect(-b.r, -b.r, b.r*2, b.r*2);
+        ctx.restore();
+      }
+      requestAnimationFrame(animate);
+    }
+    return {fire};
+  }
+
+  /* ---------- arranque ---------- */
+  nextTipInTitle();
+  function nextTipInTitle(){
+    const tips = [
+      "usa 10×n − n para el nueve",
+      "multiplicar por 12 es 10×n + 2×n",
+      "por 5 es 10×n ÷ 2",
+      "conmutativa ayuda a recordar",
+      "descompón con la distributiva",
+    ];
+    let i=0;
+    setInterval(()=>{ document.title = `liga de los números — ${tips[i%tips.length]}`; i++; }, 6000);
+  }
+
+  // crea primera vista limpia
+  function init(){
+    showScreen("home");
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
